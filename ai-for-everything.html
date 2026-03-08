@@ -1,0 +1,1581 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI FOR EVERYTHING</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600;700&family=Josefin+Sans:wght@200;300;400;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --gold: #C8952A;
+  --gold-light: #E8C870;
+  --gold-pale: #F5E9CC;
+  --cream: #FDFAF3;
+  --warm-white: #FFFEF9;
+  --amber: #D4722A;
+  --rust: #B84C2A;
+  --deep: #1A1208;
+  --text: #2C1F0A;
+  --text-mid: #5A4A2A;
+  --text-light: #8A7A5A;
+  --card-bg: #FFFFFF;
+  --border: rgba(200,149,42,0.25);
+  --shadow: rgba(200,149,42,0.15);
+  --green-tag: #2A8A4A;
+  --red-tag: #C0392B;
+  --teal: #1A8A7A;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'Josefin Sans', sans-serif;
+  background: var(--cream);
+  color: var(--text);
+  overflow-x: hidden;
+}
+
+/* ===== SCROLLBAR ===== */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--gold-pale); }
+::-webkit-scrollbar-thumb { background: var(--gold); border-radius: 3px; }
+
+/* ===== LOADING SCREEN ===== */
+#loader {
+  position: fixed; inset: 0; background: var(--deep);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  z-index: 9999; transition: opacity 0.8s ease, visibility 0.8s ease;
+}
+#loader.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+.loader-text {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(2rem, 5vw, 4rem);
+  font-weight: 300;
+  color: var(--gold-light);
+  letter-spacing: 0.3em;
+  animation: pulse-glow 1.5s ease-in-out infinite;
+}
+.loader-sub {
+  font-family: 'Josefin Sans', sans-serif;
+  font-size: 0.75rem;
+  letter-spacing: 0.5em;
+  color: var(--text-light);
+  margin-top: 0.5rem;
+  text-transform: uppercase;
+}
+.loader-bar {
+  width: 200px; height: 2px; background: rgba(200,149,42,0.2);
+  margin-top: 2rem; border-radius: 2px; overflow: hidden;
+}
+.loader-progress {
+  height: 100%; background: var(--gold-light);
+  animation: load-bar 1.8s ease-in-out forwards;
+}
+@keyframes load-bar { from { width: 0; } to { width: 100%; } }
+@keyframes pulse-glow {
+  0%,100% { text-shadow: 0 0 20px rgba(200,149,42,0.5); }
+  50% { text-shadow: 0 0 40px rgba(200,149,42,0.9), 0 0 80px rgba(200,149,42,0.3); }
+}
+
+/* ===== NAVBAR ===== */
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 1rem 3rem;
+  background: rgba(253,250,243,0.92);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+  transition: all 0.3s ease;
+}
+nav.scrolled {
+  padding: 0.7rem 3rem;
+  box-shadow: 0 4px 30px var(--shadow);
+}
+.nav-logo {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--gold);
+  letter-spacing: 0.1em;
+  cursor: pointer;
+  text-decoration: none;
+}
+.nav-logo span { color: var(--amber); }
+.nav-links { display: flex; gap: 2rem; list-style: none; }
+.nav-links a {
+  font-size: 0.7rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--text-mid);
+  text-decoration: none;
+  position: relative;
+  padding-bottom: 2px;
+  transition: color 0.3s;
+}
+.nav-links a::after {
+  content: ''; position: absolute; bottom: 0; left: 0;
+  width: 0; height: 1px; background: var(--gold);
+  transition: width 0.3s ease;
+}
+.nav-links a:hover { color: var(--gold); }
+.nav-links a:hover::after { width: 100%; }
+
+/* ===== HERO ===== */
+#home {
+  min-height: 100vh;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  position: relative; overflow: hidden;
+  padding: 8rem 2rem 4rem;
+  background: linear-gradient(135deg, var(--warm-white) 0%, var(--gold-pale) 50%, var(--cream) 100%);
+}
+.hero-bg {
+  position: absolute; inset: 0; overflow: hidden; pointer-events: none;
+}
+.hero-orb {
+  position: absolute; border-radius: 50%;
+  filter: blur(80px); opacity: 0.4;
+}
+.orb1 { width: 600px; height: 600px; background: radial-gradient(circle, #E8C870 0%, transparent 70%); top: -200px; right: -100px; animation: float 8s ease-in-out infinite; }
+.orb2 { width: 400px; height: 400px; background: radial-gradient(circle, #D4722A 0%, transparent 70%); bottom: -100px; left: -100px; animation: float 10s ease-in-out infinite reverse; }
+.orb3 { width: 300px; height: 300px; background: radial-gradient(circle, #C8952A 0%, transparent 70%); top: 50%; left: 40%; animation: float 12s ease-in-out infinite; }
+@keyframes float {
+  0%,100% { transform: translateY(0) scale(1); }
+  50% { transform: translateY(-30px) scale(1.05); }
+}
+
+.hero-grid-overlay {
+  position: absolute; inset: 0;
+  background-image: linear-gradient(rgba(200,149,42,0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(200,149,42,0.06) 1px, transparent 1px);
+  background-size: 60px 60px;
+}
+
+.hero-content { position: relative; text-align: center; max-width: 900px; }
+.hero-badge {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  background: rgba(200,149,42,0.12); border: 1px solid var(--border);
+  padding: 0.4rem 1.2rem; border-radius: 50px;
+  font-size: 0.65rem; letter-spacing: 0.3em; text-transform: uppercase;
+  color: var(--gold); margin-bottom: 1.5rem;
+  animation: fadeInDown 0.8s ease forwards;
+}
+.hero-badge::before { content: '◆'; font-size: 0.5rem; }
+.hero-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(3.5rem, 8vw, 7rem);
+  font-weight: 300;
+  line-height: 1.0;
+  color: var(--deep);
+  letter-spacing: -0.02em;
+  animation: fadeInUp 1s ease 0.2s forwards;
+  opacity: 0;
+}
+.hero-title .highlight {
+  color: var(--gold);
+  font-style: italic;
+  font-weight: 600;
+}
+.hero-subtitle {
+  font-size: clamp(0.9rem, 2vw, 1.1rem);
+  color: var(--text-mid);
+  letter-spacing: 0.1em;
+  margin: 1.5rem 0 2.5rem;
+  font-weight: 300;
+  animation: fadeInUp 1s ease 0.4s forwards;
+  opacity: 0;
+}
+.hero-cta {
+  display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;
+  animation: fadeInUp 1s ease 0.6s forwards;
+  opacity: 0;
+}
+.btn-primary {
+  background: linear-gradient(135deg, var(--gold), var(--amber));
+  color: white; border: none; padding: 0.9rem 2.5rem;
+  font-family: 'Josefin Sans', sans-serif;
+  font-size: 0.7rem; letter-spacing: 0.25em; text-transform: uppercase;
+  cursor: pointer; border-radius: 4px;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 20px rgba(200,149,42,0.35);
+}
+.btn-primary:hover { transform: translateY(-3px); box-shadow: 0 8px 30px rgba(200,149,42,0.5); }
+.btn-secondary {
+  background: transparent; color: var(--gold);
+  border: 1px solid var(--gold); padding: 0.9rem 2.5rem;
+  font-family: 'Josefin Sans', sans-serif;
+  font-size: 0.7rem; letter-spacing: 0.25em; text-transform: uppercase;
+  cursor: pointer; border-radius: 4px;
+  transition: all 0.3s ease;
+}
+.btn-secondary:hover { background: rgba(200,149,42,0.1); transform: translateY(-3px); }
+
+.hero-stats {
+  display: flex; gap: 3rem; justify-content: center; margin-top: 4rem;
+  animation: fadeInUp 1s ease 0.8s forwards;
+  opacity: 0;
+}
+.stat { text-align: center; }
+.stat-num {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 2.5rem; font-weight: 700; color: var(--gold);
+  display: block;
+}
+.stat-label {
+  font-size: 0.6rem; letter-spacing: 0.3em; text-transform: uppercase;
+  color: var(--text-light);
+}
+
+@keyframes fadeInDown { from { opacity:0; transform:translateY(-20px); } to { opacity:1; transform:translateY(0); } }
+@keyframes fadeInUp { from { opacity:0; transform:translateY(30px); } to { opacity:1; transform:translateY(0); } }
+
+/* ===== MODULES SECTION ===== */
+#modules {
+  padding: 6rem 2rem;
+  background: var(--warm-white);
+  position: relative;
+}
+.section-label {
+  text-align: center;
+  font-size: 0.65rem; letter-spacing: 0.5em; text-transform: uppercase;
+  color: var(--gold); margin-bottom: 0.8rem;
+}
+.section-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(2rem, 4vw, 3.5rem);
+  font-weight: 400;
+  text-align: center;
+  color: var(--deep);
+  margin-bottom: 1rem;
+}
+.section-title .accent { color: var(--gold); font-style: italic; }
+.section-divider {
+  display: flex; align-items: center; justify-content: center; gap: 1rem;
+  margin-bottom: 4rem;
+}
+.divider-line { width: 60px; height: 1px; background: var(--border); }
+.divider-diamond { color: var(--gold); font-size: 0.6rem; }
+
+.modules-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 1.5rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.module-card {
+  position: relative; cursor: pointer; overflow: hidden;
+  border-radius: 12px;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  padding: 2rem;
+  transition: all 0.4s cubic-bezier(0.175,0.885,0.32,1.275);
+  box-shadow: 0 2px 20px rgba(200,149,42,0.05);
+}
+.module-card:hover {
+  transform: translateY(-8px) scale(1.01);
+  box-shadow: 0 20px 50px rgba(200,149,42,0.2);
+  border-color: var(--gold);
+}
+.module-card::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--gold), var(--amber));
+  transform: scaleX(0); transform-origin: left;
+  transition: transform 0.4s ease;
+}
+.module-card:hover::before { transform: scaleX(1); }
+
+.card-number {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 4rem; font-weight: 700;
+  color: rgba(200,149,42,0.1);
+  position: absolute; top: 1rem; right: 1.5rem;
+  line-height: 1;
+  transition: color 0.3s;
+}
+.module-card:hover .card-number { color: rgba(200,149,42,0.2); }
+
+.card-icon {
+  width: 50px; height: 50px;
+  background: linear-gradient(135deg, var(--gold-pale), rgba(200,149,42,0.15));
+  border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.5rem; margin-bottom: 1.2rem;
+  transition: transform 0.3s ease;
+}
+.module-card:hover .card-icon { transform: scale(1.1) rotate(5deg); }
+
+.card-tag {
+  display: inline-block;
+  font-size: 0.55rem; letter-spacing: 0.2em; text-transform: uppercase;
+  color: var(--gold); background: rgba(200,149,42,0.1);
+  padding: 0.25rem 0.8rem; border-radius: 50px;
+  margin-bottom: 0.8rem;
+}
+.card-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.4rem; font-weight: 600;
+  color: var(--deep); margin-bottom: 0.6rem;
+  line-height: 1.3;
+}
+.card-desc {
+  font-size: 0.78rem; color: var(--text-light);
+  line-height: 1.7; margin-bottom: 1.5rem;
+}
+.card-topics { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+.topic-pill {
+  font-size: 0.6rem; letter-spacing: 0.05em;
+  background: var(--gold-pale); color: var(--text-mid);
+  padding: 0.3rem 0.8rem; border-radius: 50px;
+}
+.card-arrow {
+  position: absolute; bottom: 1.5rem; right: 1.5rem;
+  width: 36px; height: 36px;
+  background: linear-gradient(135deg, var(--gold), var(--amber));
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  color: white; font-size: 0.9rem;
+  transform: translateX(10px); opacity: 0;
+  transition: all 0.3s ease;
+}
+.module-card:hover .card-arrow { transform: translateX(0); opacity: 1; }
+
+/* ===== MODAL ===== */
+.modal-overlay {
+  position: fixed; inset: 0; z-index: 5000;
+  background: rgba(26,18,8,0.85);
+  backdrop-filter: blur(10px);
+  display: flex; align-items: center; justify-content: center;
+  padding: 2rem;
+  opacity: 0; visibility: hidden;
+  transition: all 0.4s ease;
+}
+.modal-overlay.active { opacity: 1; visibility: visible; }
+
+.modal-box {
+  background: var(--warm-white);
+  border-radius: 20px;
+  max-width: 900px; width: 100%;
+  max-height: 85vh;
+  overflow-y: auto;
+  position: relative;
+  border: 1px solid var(--border);
+  box-shadow: 0 30px 100px rgba(200,149,42,0.2);
+  transform: scale(0.9) translateY(20px);
+  transition: all 0.4s cubic-bezier(0.175,0.885,0.32,1.275);
+}
+.modal-overlay.active .modal-box { transform: scale(1) translateY(0); }
+
+.modal-header {
+  position: sticky; top: 0; z-index: 10;
+  background: linear-gradient(135deg, var(--deep), #2C1F0A);
+  padding: 1.5rem 2rem;
+  display: flex; align-items: center; justify-content: space-between;
+  border-radius: 20px 20px 0 0;
+}
+.modal-header-left { display: flex; align-items: center; gap: 1rem; }
+.modal-module-num {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.5rem; font-weight: 700; color: var(--gold);
+  background: rgba(200,149,42,0.15);
+  width: 50px; height: 50px; border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+}
+.modal-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.6rem; font-weight: 500; color: var(--gold-light);
+}
+.modal-subtitle { font-size: 0.65rem; letter-spacing: 0.2em; color: rgba(255,255,255,0.4); text-transform: uppercase; }
+.modal-close {
+  width: 40px; height: 40px;
+  background: rgba(255,255,255,0.1); border: none;
+  border-radius: 50%; cursor: pointer; color: white; font-size: 1.2rem;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.3s; flex-shrink: 0;
+}
+.modal-close:hover { background: rgba(255,255,255,0.2); transform: rotate(90deg); }
+
+.modal-body { padding: 2rem; }
+
+/* Module 1 Modal */
+.m1-section { margin-bottom: 2rem; }
+.m1-section-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.4rem; font-weight: 600; color: var(--amber);
+  border-left: 3px solid var(--gold); padding-left: 1rem;
+  margin-bottom: 1rem;
+}
+.m1-text { font-size: 0.82rem; line-height: 1.9; color: var(--text-mid); }
+.m1-list { list-style: none; padding: 0; }
+.m1-list li {
+  font-size: 0.82rem; line-height: 1.8; color: var(--text-mid);
+  padding-left: 1.5rem; position: relative; margin-bottom: 0.3rem;
+}
+.m1-list li::before { content: '◆'; position: absolute; left: 0; color: var(--gold); font-size: 0.5rem; top: 0.3rem; }
+.timeline { position: relative; padding-left: 2rem; }
+.timeline::before { content: ''; position: absolute; left: 0.5rem; top: 0; bottom: 0; width: 2px; background: linear-gradient(to bottom, var(--gold), var(--gold-pale)); }
+.timeline-item { position: relative; margin-bottom: 1.5rem; }
+.timeline-item::before {
+  content: ''; position: absolute; left: -1.75rem; top: 0.3rem;
+  width: 10px; height: 10px; border-radius: 50%;
+  background: var(--gold); border: 2px solid var(--gold-pale);
+}
+.timeline-year {
+  font-size: 0.7rem; font-weight: 700; letter-spacing: 0.15em;
+  color: var(--gold); text-transform: uppercase; margin-bottom: 0.2rem;
+}
+.timeline-text { font-size: 0.8rem; color: var(--text-mid); line-height: 1.7; }
+
+/* Module 2 sub-type selection */
+.sub-types-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 1rem; }
+.sub-type-card {
+  cursor: pointer; border-radius: 12px; overflow: hidden;
+  border: 1px solid var(--border); transition: all 0.3s ease;
+  text-align: center; padding: 2rem 1rem;
+  background: var(--card-bg);
+}
+.sub-type-card:hover {
+  border-color: var(--gold);
+  transform: translateY(-5px);
+  box-shadow: 0 15px 40px rgba(200,149,42,0.2);
+}
+.sub-type-icon { font-size: 2.5rem; display: block; margin-bottom: 1rem; }
+.sub-type-name {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.3rem; font-weight: 600; color: var(--deep); margin-bottom: 0.4rem;
+}
+.sub-type-desc { font-size: 0.72rem; color: var(--text-light); }
+
+/* Module 3-8 simple listing */
+.module-listing { display: flex; flex-direction: column; gap: 0.8rem; }
+.listing-item {
+  display: flex; align-items: center; gap: 1rem;
+  padding: 1rem 1.2rem; border-radius: 8px;
+  background: rgba(200,149,42,0.05); border: 1px solid var(--border);
+}
+.listing-num {
+  width: 28px; height: 28px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--gold), var(--amber));
+  color: white; font-size: 0.7rem; font-weight: 700;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.listing-text { font-size: 0.82rem; color: var(--text-mid); }
+
+/* ===== SUBPAGE ===== */
+#subpage {
+  display: none;
+  min-height: 100vh;
+}
+#subpage.active { display: block; }
+
+.subpage-hero {
+  background: linear-gradient(135deg, var(--deep) 0%, #2C1F0A 60%, #3A2A12 100%);
+  padding: 8rem 2rem 4rem;
+  text-align: center; position: relative; overflow: hidden;
+}
+.subpage-hero::before {
+  content: ''; position: absolute; inset: 0;
+  background-image: radial-gradient(ellipse at 50% 50%, rgba(200,149,42,0.15) 0%, transparent 70%);
+}
+.subpage-back {
+  position: absolute; top: 5.5rem; left: 2rem;
+  background: rgba(200,149,42,0.2); border: 1px solid rgba(200,149,42,0.4);
+  color: var(--gold-light); padding: 0.6rem 1.2rem;
+  border-radius: 50px; cursor: pointer; font-size: 0.65rem;
+  letter-spacing: 0.2em; text-transform: uppercase;
+  transition: all 0.3s; display: flex; align-items: center; gap: 0.5rem;
+}
+.subpage-back:hover { background: rgba(200,149,42,0.35); }
+.subpage-breadcrumb {
+  font-size: 0.65rem; letter-spacing: 0.3em; text-transform: uppercase;
+  color: rgba(200,149,42,0.7); margin-bottom: 1rem; position: relative;
+}
+.subpage-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(2.5rem, 5vw, 5rem);
+  font-weight: 300; color: var(--gold-light); position: relative;
+}
+.subpage-icon { font-size: 3rem; margin-bottom: 1rem; display: block; }
+
+.subpage-content {
+  max-width: 900px; margin: 0 auto;
+  padding: 3rem 2rem 6rem;
+}
+
+/* ===== CONTENT CARDS ===== */
+.content-section {
+  background: var(--card-bg);
+  border-radius: 16px;
+  border: 1px solid var(--border);
+  margin-bottom: 2rem;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(200,149,42,0.05);
+  animation: slideIn 0.5s ease forwards;
+  opacity: 0;
+}
+@keyframes slideIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.content-section:nth-child(1) { animation-delay: 0.1s; }
+.content-section:nth-child(2) { animation-delay: 0.2s; }
+.content-section:nth-child(3) { animation-delay: 0.3s; }
+.content-section:nth-child(4) { animation-delay: 0.4s; }
+.content-section:nth-child(5) { animation-delay: 0.5s; }
+.content-section:nth-child(6) { animation-delay: 0.6s; }
+
+.section-header {
+  padding: 1.2rem 1.8rem;
+  background: linear-gradient(135deg, rgba(200,149,42,0.08), rgba(212,114,42,0.05));
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; gap: 0.8rem;
+}
+.section-icon-sm { font-size: 1.1rem; }
+.section-label-sm {
+  font-size: 0.6rem; letter-spacing: 0.3em; text-transform: uppercase;
+  color: var(--text-light);
+}
+
+/* Main Title H1 */
+.main-title-section {
+  padding: 2.5rem 2rem;
+  background: linear-gradient(135deg, var(--deep), #1A1208);
+  text-align: center;
+}
+.main-title-text {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(1.8rem, 3vw, 2.8rem);
+  font-weight: 300;
+  background: linear-gradient(135deg, #FFD700, #FFA500, #FF8C00);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: 0.05em;
+}
+
+.tool-name-display {
+  padding: 1.5rem 1.8rem;
+  display: flex; align-items: center; gap: 1rem;
+}
+.tool-badge {
+  background: linear-gradient(135deg, var(--gold), var(--amber));
+  color: white; padding: 0.5rem 1.5rem;
+  border-radius: 50px; font-size: 0.85rem; font-weight: 600;
+  letter-spacing: 0.05em;
+}
+
+.use-display {
+  padding: 1.5rem 1.8rem;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.3rem; font-style: italic;
+  color: var(--amber); line-height: 1.5;
+}
+
+.pricing-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0; }
+.pricing-box {
+  padding: 1.5rem 1.8rem; border-right: 1px solid var(--border);
+}
+.pricing-box:last-child { border-right: none; }
+.pricing-label {
+  font-size: 0.6rem; letter-spacing: 0.3em; text-transform: uppercase;
+  font-weight: 700; margin-bottom: 0.8rem;
+  display: flex; align-items: center; gap: 0.5rem;
+}
+.pricing-label.free { color: var(--green-tag); }
+.pricing-label.paid { color: var(--rust); }
+.pricing-dot { width: 8px; height: 8px; border-radius: 50%; }
+.pricing-dot.free { background: var(--green-tag); }
+.pricing-dot.paid { background: var(--rust); }
+.pricing-items { display: flex; flex-direction: column; gap: 0.4rem; }
+.pricing-item {
+  font-size: 0.78rem; color: var(--text-mid);
+  padding: 0.35rem 0.8rem; border-radius: 6px;
+}
+.pricing-item.free-item { background: #e8f8ed; color: #1a7a3a; border: 1px solid #a8dbb8; font-weight: 600; }
+.pricing-item.paid-item { background: #fdecea; color: #b71c1c; border: 1px solid #f5a8a0; font-weight: 600; }
+
+.what-we-can { padding: 1.5rem 1.8rem; font-size: 0.83rem; color: var(--text-mid); line-height: 1.8; }
+
+.formula-box {
+  padding: 1.5rem 1.8rem;
+  background: linear-gradient(135deg, rgba(200,149,42,0.06), rgba(212,114,42,0.04));
+}
+.formula-label {
+  font-size: 0.6rem; letter-spacing: 0.3em; text-transform: uppercase;
+  color: var(--gold); margin-bottom: 0.8rem;
+}
+.formula-text {
+  font-family: 'Fira Code', monospace;
+  font-size: 0.85rem; font-weight: 500;
+  color: var(--amber);
+  background: rgba(200,149,42,0.1);
+  padding: 1rem 1.5rem; border-radius: 8px;
+  border-left: 3px solid var(--gold);
+  line-height: 1.6;
+}
+
+.prompts-section { padding: 1.5rem 1.8rem; }
+.prompts-title {
+  font-size: 0.6rem; letter-spacing: 0.3em; text-transform: uppercase;
+  color: var(--gold); margin-bottom: 1rem;
+}
+.prompt-card {
+  background: var(--cream);
+  border: 1px solid var(--border);
+  border-radius: 10px; margin-bottom: 1rem;
+  overflow: hidden;
+}
+.prompt-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0.8rem 1.2rem;
+  background: rgba(200,149,42,0.06);
+  border-bottom: 1px solid var(--border);
+}
+.prompt-num {
+  font-size: 0.65rem; letter-spacing: 0.2em; text-transform: uppercase;
+  color: var(--text-light);
+}
+.copy-btn {
+  display: flex; align-items: center; gap: 0.4rem;
+  background: linear-gradient(135deg, var(--gold), var(--amber));
+  border: none; color: white; padding: 0.35rem 1rem;
+  border-radius: 50px; font-size: 0.6rem; letter-spacing: 0.15em;
+  text-transform: uppercase; cursor: pointer;
+  transition: all 0.3s; font-family: 'Josefin Sans', sans-serif;
+}
+.copy-btn:hover { transform: scale(1.05); box-shadow: 0 4px 15px rgba(200,149,42,0.4); }
+.copy-btn.copied { background: linear-gradient(135deg, #2A8A4A, #1A7A3A); }
+.prompt-text {
+  padding: 1.2rem; font-size: 0.8rem; color: var(--text-mid);
+  line-height: 1.8; font-family: 'Josefin Sans', sans-serif;
+}
+
+/* ===== ABOUT SECTION ===== */
+#about {
+  padding: 6rem 2rem;
+  background: linear-gradient(135deg, var(--deep) 0%, #2C1F0A 100%);
+  text-align: center;
+}
+.about-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(2rem, 4vw, 3.5rem);
+  font-weight: 300; color: var(--gold-light);
+  margin-bottom: 1.5rem;
+}
+.about-text { font-size: 0.88rem; color: rgba(255,255,255,0.5); line-height: 2; max-width: 600px; margin: 0 auto 3rem; }
+.features-grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem; max-width: 800px; margin: 0 auto;
+}
+.feature-card {
+  background: rgba(255,255,255,0.04); border: 1px solid rgba(200,149,42,0.2);
+  padding: 1.5rem; border-radius: 12px; text-align: center;
+  transition: all 0.3s;
+}
+.feature-card:hover { background: rgba(200,149,42,0.1); transform: translateY(-5px); }
+.feature-icon { font-size: 2rem; margin-bottom: 0.8rem; }
+.feature-name { font-size: 0.75rem; letter-spacing: 0.1em; color: var(--gold-light); text-transform: uppercase; }
+
+/* ===== FOOTER ===== */
+footer {
+  background: var(--deep);
+  border-top: 1px solid rgba(200,149,42,0.2);
+  padding: 2rem;
+  text-align: center;
+}
+.footer-logo {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.3rem; color: var(--gold); margin-bottom: 0.5rem;
+}
+.footer-text { font-size: 0.65rem; letter-spacing: 0.2em; color: rgba(255,255,255,0.3); }
+
+/* ===== HAMBURGER MENU ===== */
+.hamburger {
+  display: none; flex-direction: column; gap: 5px;
+  cursor: pointer; padding: 6px; background: none; border: none;
+  z-index: 1100;
+}
+.hamburger span {
+  display: block; width: 24px; height: 2px;
+  background: var(--gold); border-radius: 2px;
+  transition: all 0.3s ease;
+}
+.hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+.hamburger.open span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+.hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+.mobile-nav {
+  display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(26,18,8,0.97); z-index: 1050;
+  flex-direction: column; align-items: center; justify-content: center;
+  gap: 2rem; padding: 2rem;
+}
+.mobile-nav.open { display: flex; animation: fadeIn 0.3s ease; }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+.mobile-nav a {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 2rem; font-weight: 300; color: var(--gold-light);
+  text-decoration: none; letter-spacing: 0.1em;
+  transition: color 0.2s;
+}
+.mobile-nav a:hover { color: var(--gold); }
+.mobile-nav-close {
+  position: absolute; top: 1.5rem; right: 1.5rem;
+  background: none; border: none; color: var(--gold);
+  font-size: 1.8rem; cursor: pointer;
+}
+
+/* ===== RESPONSIVE — TABLET (max 1024px) ===== */
+@media (max-width: 1024px) {
+  .modules-grid { grid-template-columns: repeat(2, 1fr); }
+  .hero-title { font-size: clamp(3rem, 7vw, 5rem); }
+}
+
+/* ===== RESPONSIVE — MOBILE (max 768px) ===== */
+@media (max-width: 768px) {
+  /* Nav */
+  nav { padding: 1rem 1.2rem; }
+  .nav-links { display: none; }
+  .hamburger { display: flex; }
+
+  /* Hero */
+  #home { padding: 6rem 1.2rem 3rem; }
+  .hero-title { font-size: clamp(2.5rem, 11vw, 3.5rem); line-height: 1.05; }
+  .hero-subtitle { font-size: 0.82rem; margin: 1rem 0 1.8rem; }
+  .hero-cta { flex-direction: column; align-items: center; gap: 0.8rem; }
+  .btn-primary, .btn-secondary { width: 100%; max-width: 280px; text-align: center; padding: 0.9rem 1.5rem; }
+  .hero-stats { gap: 1.2rem; flex-wrap: wrap; justify-content: center; }
+  .stat-num { font-size: 2rem; }
+  .orb1 { width: 300px; height: 300px; }
+  .orb2 { width: 200px; height: 200px; }
+  .orb3 { width: 150px; height: 150px; }
+
+  /* Modules section */
+  #modules { padding: 4rem 1.2rem; }
+  .section-title { font-size: clamp(1.6rem, 6vw, 2.2rem); }
+  .modules-grid { grid-template-columns: 1fr; gap: 1rem; }
+  .module-card { padding: 1.5rem; }
+  .card-number { font-size: 3rem; top: 0.8rem; right: 1rem; }
+  .card-title { font-size: 1.2rem; }
+
+  /* About */
+  #about { padding: 4rem 1.2rem; }
+  .about-title { font-size: clamp(1.6rem, 6vw, 2.2rem); }
+  .features-grid { grid-template-columns: repeat(2, 1fr); gap: 1rem; }
+
+  /* Modal */
+  .modal-overlay { padding: 0; align-items: flex-end; }
+  .modal-box {
+    max-height: 92vh; border-radius: 20px 20px 0 0;
+    width: 100%; max-width: 100%;
+  }
+  .modal-header { padding: 1.2rem 1.2rem; border-radius: 20px 20px 0 0; }
+  .modal-title { font-size: 1.2rem; }
+  .modal-module-num { width: 40px; height: 40px; font-size: 1.2rem; }
+  .modal-body { padding: 1.2rem; }
+
+  /* Modal sub-types grid */
+  .sub-types-grid { grid-template-columns: 1fr; gap: 0.8rem; }
+  .sub-type-card { padding: 1.2rem; display: flex; align-items: center; text-align: left; gap: 1rem; }
+  .sub-type-icon { font-size: 1.8rem; flex-shrink: 0; }
+
+  /* Pricing */
+  .pricing-grid { grid-template-columns: 1fr; }
+  .pricing-box:first-child { border-right: none; border-bottom: 1px solid var(--border); }
+  .pricing-box { padding: 1rem 1.2rem; }
+
+  /* Subpage */
+  .subpage-hero { padding: 6rem 1.2rem 3rem; }
+  .subpage-back { top: 4.5rem; left: 1rem; font-size: 0.6rem; padding: 0.5rem 0.9rem; }
+  .subpage-title { font-size: clamp(2rem, 9vw, 3rem); }
+  .subpage-content { padding: 2rem 1rem 5rem; }
+
+  /* Content sections */
+  .section-header { padding: 1rem 1.2rem; }
+  .main-title-section { padding: 2rem 1.2rem; }
+  .main-title-text { font-size: clamp(1.4rem, 6vw, 2rem); }
+  .tool-name-display { padding: 1rem 1.2rem; }
+  .use-display { padding: 1rem 1.2rem; font-size: 1.1rem; }
+  .formula-box { padding: 1rem 1.2rem; }
+  .formula-text { font-size: 0.75rem; padding: 0.8rem; }
+  .prompts-section { padding: 1rem 1.2rem; }
+  .prompt-text { padding: 1rem; font-size: 0.78rem; }
+  .what-we-can { padding: 1rem 1.2rem; font-size: 0.8rem; }
+
+  /* Prompt copy header stacks on small screens */
+  .prompt-header { flex-wrap: wrap; gap: 0.5rem; }
+
+  /* Toast */
+  .toast { bottom: 1rem; right: 1rem; left: 1rem; text-align: center; }
+
+  /* Footer */
+  footer { padding: 1.5rem 1.2rem; }
+}
+
+/* ===== RESPONSIVE — SMALL MOBILE (max 400px) ===== */
+@media (max-width: 400px) {
+  .hero-title { font-size: clamp(2rem, 13vw, 3rem); }
+  .hero-stats { gap: 0.8rem; }
+  .stat-num { font-size: 1.7rem; }
+  .stat-label { font-size: 0.5rem; }
+  .features-grid { grid-template-columns: repeat(2, 1fr); }
+  .modules-grid { gap: 0.8rem; }
+  .sub-type-card { padding: 1rem; }
+  .modal-title { font-size: 1rem; }
+  .modal-subtitle { display: none; }
+}
+
+/* Notification */
+.toast {
+  position: fixed; bottom: 2rem; right: 2rem; z-index: 9999;
+  background: linear-gradient(135deg, var(--gold), var(--amber));
+  color: white; padding: 0.8rem 1.5rem; border-radius: 8px;
+  font-size: 0.75rem; letter-spacing: 0.1em;
+  transform: translateY(100px); opacity: 0;
+  transition: all 0.4s cubic-bezier(0.175,0.885,0.32,1.275);
+  box-shadow: 0 8px 30px rgba(200,149,42,0.4);
+}
+.toast.show { transform: translateY(0); opacity: 1; }
+
+/* Content animation stagger */
+.content-section { animation-fill-mode: both; }
+</style>
+</head>
+<body>
+
+<!-- LOADING SCREEN -->
+<div id="loader">
+  <div class="loader-text">AI FOR EVERYTHING</div>
+  <div class="loader-sub">Initializing Intelligence</div>
+  <div class="loader-bar"><div class="loader-progress"></div></div>
+</div>
+
+<!-- TOAST NOTIFICATION -->
+<div class="toast" id="toast">✓ Copied to clipboard!</div>
+
+<!-- NAVBAR -->
+<nav id="navbar">
+  <a class="nav-logo" href="#home" onclick="goHome()">AI <span>FOR</span> EVERYTHING</a>
+  <ul class="nav-links">
+    <li><a href="#home" onclick="goHome()">Home</a></li>
+    <li><a href="#modules">Modules</a></li>
+    <li><a href="#about">About</a></li>
+  </ul>
+  <button class="hamburger" id="hamburger" onclick="toggleMobileNav()" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<!-- MOBILE NAV -->
+<div class="mobile-nav" id="mobile-nav">
+  <button class="mobile-nav-close" onclick="toggleMobileNav()">✕</button>
+  <a href="#home" onclick="goHome();toggleMobileNav()">Home</a>
+  <a href="#modules" onclick="toggleMobileNav();setTimeout(()=>document.getElementById('modules').scrollIntoView({behavior:'smooth'}),300)">Modules</a>
+  <a href="#about" onclick="toggleMobileNav();setTimeout(()=>document.getElementById('about').scrollIntoView({behavior:'smooth'}),300)">About</a>
+</div>
+
+<!-- ===== MAIN SITE ===== -->
+<div id="main-site">
+
+  <!-- HERO -->
+  <section id="home">
+    <div class="hero-bg">
+      <div class="hero-orb orb1"></div>
+      <div class="hero-orb orb2"></div>
+      <div class="hero-orb orb3"></div>
+      <div class="hero-grid-overlay"></div>
+    </div>
+    <div class="hero-content">
+      <div class="hero-badge">The Future of Intelligence is Here</div>
+      <h1 class="hero-title">
+        AI For<br><span class="highlight">Everything</span>
+      </h1>
+      <p class="hero-subtitle">Your complete guide to mastering Artificial Intelligence across every domain</p>
+      <div class="hero-cta">
+        <button class="btn-primary" onclick="document.getElementById('modules').scrollIntoView({behavior:'smooth'})">Explore Modules</button>
+        <button class="btn-secondary" onclick="openModal(1)">Start with Intro</button>
+      </div>
+      <div class="hero-stats">
+        <div class="stat"><span class="stat-num">8</span><span class="stat-label">Modules</span></div>
+        <div class="stat"><span class="stat-num">20+</span><span class="stat-label">AI Tools</span></div>
+        <div class="stat"><span class="stat-num">∞</span><span class="stat-label">Possibilities</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- MODULES GRID -->
+  <section id="modules">
+    <p class="section-label">Curriculum</p>
+    <h2 class="section-title">Explore All <span class="accent">Modules</span></h2>
+    <div class="section-divider">
+      <div class="divider-line"></div>
+      <span class="divider-diamond">◆</span>
+      <div class="divider-line"></div>
+    </div>
+
+    <div class="modules-grid">
+      <!-- Module 1 -->
+      <div class="module-card" onclick="openModal(1)">
+        <div class="card-number">01</div>
+        <div class="card-icon">🧠</div>
+        <div class="card-tag">Foundation</div>
+        <div class="card-title">Introduction of AI</div>
+        <div class="card-desc">Master the fundamentals of Artificial Intelligence — from its origins to real-world applications.</div>
+        <div class="card-topics">
+          <span class="topic-pill">What is AI</span>
+          <span class="topic-pill">History</span>
+          <span class="topic-pill">Applications</span>
+          <span class="topic-pill">Tools</span>
+        </div>
+        <div class="card-arrow">→</div>
+      </div>
+
+      <!-- Module 2 -->
+      <div class="module-card" onclick="openModal(2)">
+        <div class="card-number">02</div>
+        <div class="card-icon">🎨</div>
+        <div class="card-tag">Creative AI</div>
+        <div class="card-title">Creative Content Creation</div>
+        <div class="card-desc">Generate stunning images, immersive audio, and cinematic videos using cutting-edge AI tools.</div>
+        <div class="card-topics">
+          <span class="topic-pill">Image Generation</span>
+          <span class="topic-pill">Audio</span>
+          <span class="topic-pill">Video</span>
+        </div>
+        <div class="card-arrow">→</div>
+      </div>
+
+      <!-- Module 3 -->
+      <div class="module-card" onclick="openModal(3)">
+        <div class="card-number">03</div>
+        <div class="card-icon">💻</div>
+        <div class="card-tag">Development</div>
+        <div class="card-title">Writing & Debugging Code</div>
+        <div class="card-desc">Accelerate development with AI-powered code generation, debugging, and intelligent suggestions.</div>
+        <div class="card-topics">
+          <span class="topic-pill">AI Coding</span>
+          <span class="topic-pill">Debugging</span>
+          <span class="topic-pill">Fast Dev</span>
+        </div>
+        <div class="card-arrow">→</div>
+      </div>
+
+      <!-- Module 4 -->
+      <div class="module-card" onclick="openModal(4)">
+        <div class="card-number">04</div>
+        <div class="card-icon">🌐</div>
+        <div class="card-tag">Web Build</div>
+        <div class="card-title">Building Websites with AI</div>
+        <div class="card-desc">Create professional websites and landing pages without writing a single line of code.</div>
+        <div class="card-topics">
+          <span class="topic-pill">No-Code</span>
+          <span class="topic-pill">Landing Pages</span>
+          <span class="topic-pill">Design</span>
+        </div>
+        <div class="card-arrow">→</div>
+      </div>
+
+      <!-- Module 5 -->
+      <div class="module-card" onclick="openModal(5)">
+        <div class="card-number">05</div>
+        <div class="card-icon">📢</div>
+        <div class="card-tag">Marketing</div>
+        <div class="card-title">Generating Marketing Content</div>
+        <div class="card-desc">Create compelling blogs, ad copy, and social media content that converts with AI automation.</div>
+        <div class="card-topics">
+          <span class="topic-pill">Blog Writing</span>
+          <span class="topic-pill">Ad Copy</span>
+          <span class="topic-pill">Social Media</span>
+        </div>
+        <div class="card-arrow">→</div>
+      </div>
+
+      <!-- Module 6 -->
+      <div class="module-card" onclick="openModal(6)">
+        <div class="card-number">06</div>
+        <div class="card-icon">📊</div>
+        <div class="card-tag">Visual</div>
+        <div class="card-title">Designing Presentations</div>
+        <div class="card-desc">Auto-generate stunning presentations, infographics, and visual stories that captivate audiences.</div>
+        <div class="card-topics">
+          <span class="topic-pill">Presentations</span>
+          <span class="topic-pill">Infographics</span>
+          <span class="topic-pill">Storytelling</span>
+        </div>
+        <div class="card-arrow">→</div>
+      </div>
+
+      <!-- Module 7 -->
+      <div class="module-card" onclick="openModal(7)">
+        <div class="card-number">07</div>
+        <div class="card-icon">⚡</div>
+        <div class="card-tag">Automation</div>
+        <div class="card-title">Automating Daily Work</div>
+        <div class="card-desc">Eliminate repetitive tasks with AI-powered meeting summaries, document generation, and automation.</div>
+        <div class="card-topics">
+          <span class="topic-pill">Meeting AI</span>
+          <span class="topic-pill">Docs</span>
+          <span class="topic-pill">Automation</span>
+        </div>
+        <div class="card-arrow">→</div>
+      </div>
+
+      <!-- Module 8 -->
+      <div class="module-card" onclick="openModal(8)">
+        <div class="card-number">08</div>
+        <div class="card-icon">🔬</div>
+        <div class="card-tag">Research</div>
+        <div class="card-title">Researching & Learning Faster</div>
+        <div class="card-desc">Supercharge your research with AI-powered discovery, paper summarization, and smart insights.</div>
+        <div class="card-topics">
+          <span class="topic-pill">AI Research</span>
+          <span class="topic-pill">Paper Summary</span>
+          <span class="topic-pill">Discovery</span>
+        </div>
+        <div class="card-arrow">→</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ABOUT -->
+  <section id="about">
+    <p style="font-size:0.65rem;letter-spacing:0.5em;text-transform:uppercase;color:rgba(200,149,42,0.6);margin-bottom:0.8rem;">Why This Platform</p>
+    <h2 class="about-title">Intelligence, <em>Simplified</em></h2>
+    <p class="about-text">AI FOR EVERYTHING is your comprehensive guide to harnessing artificial intelligence across every dimension of work and creativity. From generating images to automating workflows — master it all.</p>
+    <div class="features-grid">
+      <div class="feature-card"><div class="feature-icon">🎯</div><div class="feature-name">Structured Learning</div></div>
+      <div class="feature-card"><div class="feature-icon">🛠️</div><div class="feature-name">Real AI Tools</div></div>
+      <div class="feature-card"><div class="feature-icon">📋</div><div class="feature-name">Ready Prompts</div></div>
+      <div class="feature-card"><div class="feature-icon">🚀</div><div class="feature-name">Practical Skills</div></div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="footer-logo">AI FOR EVERYTHING</div>
+    <div class="footer-text">◆ Your Complete AI Learning Journey ◆</div>
+  </footer>
+</div>
+
+<!-- ===== SUBPAGE ===== -->
+<div id="subpage">
+  <div class="subpage-hero" id="subpage-hero">
+    <button class="subpage-back" onclick="goHome()">← Back to Modules</button>
+    <div class="subpage-breadcrumb" id="subpage-breadcrumb">Module 2 → Creative Content</div>
+    <div class="subpage-icon" id="subpage-icon">🎨</div>
+    <h1 class="subpage-title" id="subpage-title">Image Generation</h1>
+  </div>
+  <div class="subpage-content" id="subpage-content"></div>
+</div>
+
+<!-- ===== MODALS ===== -->
+<div class="modal-overlay" id="modal-overlay" onclick="closeModalOnOverlay(event)">
+  <div class="modal-box" id="modal-box">
+    <div class="modal-header">
+      <div class="modal-header-left">
+        <div class="modal-module-num" id="modal-num">01</div>
+        <div>
+          <div class="modal-title" id="modal-title">Module Title</div>
+          <div class="modal-subtitle" id="modal-subtitle">SUBTITLE</div>
+        </div>
+      </div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body" id="modal-content"></div>
+  </div>
+</div>
+
+<script>
+// ===== LOADER =====
+window.addEventListener('load', () => {
+  setTimeout(() => { document.getElementById('loader').classList.add('hidden'); }, 2000);
+});
+
+// ===== MOBILE NAV =====
+function toggleMobileNav() {
+  const nav = document.getElementById('mobile-nav');
+  const ham = document.getElementById('hamburger');
+  nav.classList.toggle('open');
+  ham.classList.toggle('open');
+  document.body.style.overflow = nav.classList.contains('open') ? 'hidden' : '';
+}
+
+// ===== NAVBAR SCROLL =====
+window.addEventListener('scroll', () => {
+  const nav = document.getElementById('navbar');
+  if (window.scrollY > 50) nav.classList.add('scrolled');
+  else nav.classList.remove('scrolled');
+});
+
+// ===== TOAST =====
+function showToast(msg = '✓ Copied to clipboard!') {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// ===== COPY =====
+function copyPrompt(btn, text) {
+  navigator.clipboard.writeText(text).then(() => {
+    btn.innerHTML = '✓ Copied'; btn.classList.add('copied');
+    showToast();
+    setTimeout(() => { btn.innerHTML = '⎘ Copy'; btn.classList.remove('copied'); }, 2500);
+  });
+}
+
+// ===== MODAL =====
+const modalData = {
+  1: {
+    num: '01', title: 'Introduction of AI', subtitle: 'FOUNDATION MODULE',
+    content: `<div id="m1-content"></div>`
+  },
+  2: {
+    num: '02', title: 'Creative Content Creation', subtitle: 'MODULE 2 — SELECT CATEGORY',
+    content: `
+    <p style="font-size:0.78rem;color:var(--text-light);text-align:center;margin-bottom:1.5rem;letter-spacing:0.1em;">Choose a creative domain to explore</p>
+    <div class="sub-types-grid">
+      <div class="sub-type-card" onclick="closeModal();openSubpage('image')">
+        <span class="sub-type-icon">🖼️</span>
+        <div class="sub-type-name">Image Generation</div>
+        <div class="sub-type-desc">Turn imagination into stunning visuals in seconds</div>
+      </div>
+      <div class="sub-type-card" onclick="closeModal();openSubpage('audio')">
+        <span class="sub-type-icon">🎵</span>
+        <div class="sub-type-name">Audio Generation</div>
+        <div class="sub-type-desc">Give your ideas a voice that sounds truly human</div>
+      </div>
+      <div class="sub-type-card" onclick="closeModal();openSubpage('video')">
+        <span class="sub-type-icon">🎬</span>
+        <div class="sub-type-name">Video Generation</div>
+        <div class="sub-type-desc">Transform your vision into cinematic videos effortlessly</div>
+      </div>
+    </div>`
+  },
+  3: {
+    num: '03', title: 'Writing & Debugging Code', subtitle: 'MODULE 3 — DEVELOPMENT',
+    content: buildSimpleModal('code', [
+      { title: '🛠️ Tool Name', text: 'Code Generator' },
+      { title: '💡 Use', text: '"From concept to working code — fast, accurate, and debugged."' },
+      { title: '🆓 Free Tools', type: 'free', tools: ['Z.ai'] },
+      { title: '💳 Paid Tools', type: 'paid', tools: ['Cursor (~$20/month)', 'GitHub Copilot (~$10/month)'] },
+      { title: '🎯 What We Can Do', text: '"From idea to error-free code, AI generates and debugs programs with remarkable speed and accuracy."' },
+      { title: '📐 Formula', text: 'Task + Language + Features + Design + Requirements + Output', formula: true },
+      { title: '⚡ Sub-Topics', items: ['AI Assisted Coding', 'Faster Development', 'Debugging with AI Suggestions'] }
+    ])
+  },
+  4: {
+    num: '04', title: 'Building Websites with AI', subtitle: 'MODULE 4 — WEB BUILD',
+    content: buildSimpleModal('web', [
+      { title: '🛠️ Tool Name', text: 'Website Generator' },
+      { title: '💡 Use', text: '"Where creativity meets web innovation."' },
+      { title: '🆓 Free Tools', type: 'free', tools: ['Wix', 'Jimdo'] },
+      { title: '💳 Paid Tools', type: 'paid', tools: ['WebFlow (~$14–$23/month)', 'Durable (~$12/month)'] },
+      { title: '🎯 What We Can Do', text: '"AI tools allow users to build professional websites quickly by turning simple ideas or prompts into fully designed web pages."' },
+      { title: '📐 Formula', text: 'Website type + Purpose + Pages + Features + Design style + Colors + Responsiveness', formula: true },
+      { title: '⚡ Sub-Topics', items: ['Create websites without coding', 'Build landing pages using AI'] }
+    ])
+  },
+  5: {
+    num: '05', title: 'Generating Marketing Content', subtitle: 'MODULE 5 — MARKETING',
+    content: buildSimpleModal('marketing', [
+      { title: '🛠️ Tool Name', text: 'Content Generator' },
+      { title: '💡 Use', text: '"One Generator. Unlimited Content Possibilities."' },
+      { title: '🆓 Free Tools', type: 'free', tools: ['Writesonic (Blog writing)', 'Copy.ai (Ad copy)', 'Rytr (Social media)'] },
+      { title: '💳 Paid Tools', type: 'paid', tools: ['Jasper AI (Content marketing)', 'Writesonic Pro', 'Copy.ai Pro'] },
+      { title: '🎯 What We Can Do', text: '"Generate engaging blogs, persuasive ad copy, and impactful social media content with intelligent automation."' },
+      { title: '📐 Formula', text: '[Role] + [Task] + [Topic/Product] + [Target Audience] + [Tone/Style] + [Output Format]', formula: true },
+      { title: '⚡ Sub-Topics', items: ['Blog Writing', 'Ad Copy Creation', 'Social Media Content'] }
+    ])
+  },
+  6: {
+    num: '06', title: 'Designing Presentations', subtitle: 'MODULE 6 — VISUAL',
+    content: buildSimpleModal('visual', [
+      { title: '🛠️ Tool Name', text: 'Visualize & Presentation Generator' },
+      { title: '💡 Use', text: '"Creates professional PPTs, diagrams, and visual storytelling."' },
+      { title: '🆓 Free Tools', type: 'free', tools: ['Canva (free tier)', 'Beautiful.ai (free)', 'Gamma.app (free)'] },
+      { title: '💳 Paid Tools', type: 'paid', tools: ['Canva Pro', 'Beautiful.ai Pro', 'Tome.app'] },
+      { title: '🎯 What We Can Do', text: '"Automatically generate presentations, infographics, and visual narratives that communicate ideas powerfully."' },
+      { title: '📐 Formula', text: 'Topic + Audience + Slide Count + Style + Key Points + Visuals', formula: true },
+      { title: '⚡ Sub-Topics', items: ['Create presentations automatically', 'Generate infographics and diagrams', 'Visual storytelling'] }
+    ])
+  },
+  7: {
+    num: '07', title: 'Automating Daily Work', subtitle: 'MODULE 7 — AUTOMATION',
+    content: buildSimpleModal('auto', [
+      { title: '🛠️ Tool Name', text: 'Automation Assistant' },
+      { title: '💡 Use', text: '"Reclaim your time by automating repetitive work with AI."' },
+      { title: '🆓 Free Tools', type: 'free', tools: ['Otter.ai (free tier)', 'Notion AI (limited free)', 'ChatGPT (free)'] },
+      { title: '💳 Paid Tools', type: 'paid', tools: ['Otter.ai Pro', 'Notion AI Pro', 'Zapier AI', 'Make.com'] },
+      { title: '🎯 What We Can Do', text: '"Summarize meetings, generate professional documents, and automate workflows that used to take hours."' },
+      { title: '📐 Formula', text: 'Task + Input Data + Automation Tool + Output Format + Trigger', formula: true },
+      { title: '⚡ Sub-Topics', items: ['Meeting Summaries', 'Document Generation', 'Task Automation'] }
+    ])
+  },
+  8: {
+    num: '08', title: 'Researching & Learning Faster', subtitle: 'MODULE 8 — RESEARCH',
+    content: buildSimpleModal('research', [
+      { title: '🛠️ Tool Name', text: 'Research Assistant' },
+      { title: '💡 Use', text: '"Turn complex papers into clear insights — research smarter, not harder."' },
+      { title: '🆓 Free Tools', type: 'free', tools: ['Perplexity (AI search)', 'Elicit (Academic research)', 'Scholarly (Paper summarizing)', 'You.com (Search engine)'] },
+      { title: '💳 Paid Tools', type: 'paid', tools: ['Perplexity Pro', 'Elicit Pro', 'Consensus (Premium)'] },
+      { title: '🎯 What We Can Do', text: '"Unlock the essence of any paper — quick summaries, key points, and smarter reading."' },
+      { title: '📐 Formula', text: 'Prepare → Choose Tool → Input Paper → Summarize (general → section-wise → key insights) → Review & Refine → Use', formula: true },
+      { title: '⚡ Sub-Topics', items: ['AI Powered Research', 'Paper Summarization', 'Smart Information Discovery'] }
+    ])
+  }
+};
+
+function buildSimpleModal(id, sections) {
+  let html = '';
+  sections.forEach(s => {
+    const isFormula = s.formula;
+    const isFree = s.type === 'free';
+    const isPaid = s.type === 'paid';
+
+    html += `<div style="margin-bottom:1.2rem;padding:1rem 1.2rem;border-radius:10px;background:rgba(200,149,42,0.04);border:1px solid var(--border);">`;
+    html += `<div style="font-size:0.65rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--gold);margin-bottom:0.7rem;">${s.title}</div>`;
+
+    if (s.items) {
+      s.items.forEach(item => {
+        html += `<div style="font-size:0.8rem;color:var(--text-mid);padding:0.3rem 0;padding-left:1rem;border-left:2px solid var(--gold-pale);">◆ ${item}</div>`;
+      });
+    } else if (isFormula) {
+      html += `<div style="font-family:'Fira Code',monospace;font-size:0.82rem;font-weight:600;color:var(--amber);background:rgba(200,149,42,0.1);padding:0.8rem 1rem;border-radius:6px;border-left:3px solid var(--gold);">${s.text}</div>`;
+    } else if (isFree && s.tools) {
+      html += `<div style="display:flex;flex-wrap:wrap;gap:0.5rem;">`;
+      s.tools.forEach(t => {
+        html += `<span style="display:inline-flex;align-items:center;gap:0.35rem;background:#e8f8ed;color:#1a7a3a;border:1px solid #a8dbb8;padding:0.35rem 0.9rem;border-radius:50px;font-size:0.75rem;font-weight:600;">✓ ${t}</span>`;
+      });
+      html += `</div>`;
+    } else if (isPaid && s.tools) {
+      html += `<div style="display:flex;flex-wrap:wrap;gap:0.5rem;">`;
+      s.tools.forEach(t => {
+        html += `<span style="display:inline-flex;align-items:center;gap:0.35rem;background:#fdecea;color:#b71c1c;border:1px solid #f5a8a0;padding:0.35rem 0.9rem;border-radius:50px;font-size:0.75rem;font-weight:600;">★ ${t}</span>`;
+      });
+      html += `</div>`;
+    } else {
+      html += `<div style="font-size:0.82rem;color:var(--text-mid);line-height:1.7;">${s.text}</div>`;
+    }
+    html += `</div>`;
+  });
+  return html;
+}
+
+function openModal(num) {
+  const data = modalData[num];
+  if (!data) return;
+  document.getElementById('modal-num').textContent = data.num;
+  document.getElementById('modal-title').textContent = data.title;
+  document.getElementById('modal-subtitle').textContent = data.subtitle;
+  document.getElementById('modal-content').innerHTML = data.content;
+  if (num === 1) buildM1Content();
+  document.getElementById('modal-overlay').classList.add('active');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeModal() {
+  document.getElementById('modal-overlay').classList.remove('active');
+  document.body.style.overflow = '';
+}
+
+function closeModalOnOverlay(e) {
+  if (e.target === document.getElementById('modal-overlay')) closeModal();
+}
+
+// ===== MODULE 1 CONTENT =====
+function buildM1Content() {
+  const c = document.getElementById('m1-content');
+  c.innerHTML = `
+  <div class="m1-section">
+    <div class="m1-section-title">1. What is Artificial Intelligence?</div>
+    <p class="m1-text">Artificial Intelligence is a technology that enables computers and machines to perform tasks that normally require human intelligence. These tasks include:</p>
+    <ul class="m1-list" style="margin-top:0.8rem;">
+      <li>Learning from data</li><li>Understanding language</li><li>Recognizing images</li>
+      <li>Making decisions</li><li>Solving problems</li>
+    </ul>
+    <p class="m1-text" style="margin-top:0.8rem;"><strong style="color:var(--amber);">In simple words:</strong> AI is when machines are designed to think, learn, and work like humans.</p>
+    <p class="m1-text" style="margin-top:0.6rem;"><strong style="color:var(--gold);">Examples:</strong> Voice assistants like Siri or Alexa • Chatbots like ChatGPT • Self-driving cars</p>
+  </div>
+  <div class="m1-section">
+    <div class="m1-section-title">2. History of AI</div>
+    <div class="timeline">
+      <div class="timeline-item"><div class="timeline-year">1950 — The Beginning</div><div class="timeline-text">Alan Turing proposed that machines could think like humans and introduced the Turing Test.</div></div>
+      <div class="timeline-item"><div class="timeline-year">1956 — Birth of AI</div><div class="timeline-text">The term "Artificial Intelligence" was officially coined at the Dartmouth Conference by John McCarthy.</div></div>
+      <div class="timeline-item"><div class="timeline-year">1980s — Expert Systems</div><div class="timeline-text">AI systems were developed to help in decision-making in fields like medicine and finance.</div></div>
+      <div class="timeline-item"><div class="timeline-year">2000s — Machine Learning Era</div><div class="timeline-text">Computers started learning from data instead of being explicitly programmed.</div></div>
+      <div class="timeline-item"><div class="timeline-year">2010s — Deep Learning</div><div class="timeline-text">AI became powerful due to big data and strong computing power, transforming every industry.</div></div>
+    </div>
+  </div>
+  <div class="m1-section">
+    <div class="m1-section-title">3. Why Do We Use AI?</div>
+    <p class="m1-text">AI is used because it helps to:</p>
+    <ul class="m1-list" style="margin-top:0.6rem;">
+      <li>Work faster and more efficiently</li><li>Reduce human effort and errors</li>
+      <li>Improve accuracy in critical decisions</li><li>Analyze large amounts of data instantly</li>
+      <li>Automate repetitive and time-consuming tasks</li>
+    </ul>
+    <p class="m1-text" style="margin-top:0.6rem;"><strong style="color:var(--gold);">Examples:</strong> Banks detect fraud • Hospitals use AI for disease detection • Companies use AI for customer support</p>
+  </div>
+  <div class="m1-section">
+    <div class="m1-section-title">4. How Do We Use AI?</div>
+    <p class="m1-text">AI works by using:</p>
+    <ul class="m1-list" style="margin-top:0.6rem;">
+      <li><strong style="color:var(--amber);">Data:</strong> AI learns from large datasets</li>
+      <li><strong style="color:var(--amber);">Algorithms:</strong> Mathematical instructions that allow machines to learn patterns</li>
+      <li><strong style="color:var(--amber);">Machine Learning:</strong> Machines learn automatically from experience</li>
+    </ul>
+  </div>
+  <div class="m1-section">
+    <div class="m1-section-title">5. Where Do We Use AI?</div>
+    <ul class="m1-list">
+      <li>Healthcare: Disease diagnosis and treatment planning</li>
+      <li>Finance: Fraud detection and algorithmic trading</li>
+      <li>Education: Personalized learning platforms</li>
+      <li>Entertainment: Recommendation systems</li>
+      <li>Transportation: Self-driving vehicles</li>
+    </ul>
+  </div>
+  <div class="m1-section">
+    <div class="m1-section-title">6. Advantages of AI</div>
+    <ul class="m1-list">
+      <li>24/7 availability without fatigue</li><li>High speed data processing</li>
+      <li>Elimination of human error</li><li>Cost reduction through automation</li>
+      <li>Enhanced decision-making capabilities</li>
+    </ul>
+  </div>
+  <div class="m1-section">
+    <div class="m1-section-title">7. Dangers of AI</div>
+    <ul class="m1-list">
+      <li>Job displacement and unemployment</li><li>Privacy and surveillance concerns</li>
+      <li>Bias in AI decision-making</li><li>Dependency and loss of human skills</li>
+      <li>Potential misuse for malicious purposes</li>
+    </ul>
+  </div>`;
+}
+
+// ===== SUBPAGE =====
+const subpageData = {
+  image: {
+    icon: '🖼️',
+    breadcrumb: 'Module 2 → Creative Content → Image',
+    title: 'Image Generation',
+    mainTitle: 'AI Image Generation',
+    toolName: 'Image Generator',
+    use: '"Turn imagination into stunning visuals in seconds."',
+    free: ['Freefly (with credits)', 'Leonardo.ai (with credits)', 'Bing Image Creator', 'Nano Banana'],
+    paid: ['DALL·E 3 — ChatGPT Plus (~$20/month)', 'Leonardo AI Professional (~$24/month)'],
+    whatWeCan: 'Describe your imagination and within seconds you will get a stunning image of exactly what you envisioned. AI image generators transform text descriptions into professional-quality visuals for any purpose.',
+    formula: 'Subject + Environment + Lighting + Camera Details + Quality',
+    prompts: [
+      {
+        title: 'Realistic Human Portrait',
+        text: 'A cinematic portrait of a calm and intelligent young man standing in the rain at night, soft neon lights reflecting on the street, ultra-realistic, 4K photography, dramatic lighting, shallow depth of field.'
+      },
+      {
+        title: 'Cyberpunk City',
+        text: 'A futuristic cyberpunk city at night with glowing neon billboards, flying cars above the streets, rainy atmosphere with reflections on wet roads, people walking with umbrellas, cinematic lighting, ultra realistic architecture, high detail environment, 8K photorealistic render.'
+      },
+      {
+        title: 'Luxury Product Photography',
+        text: 'A luxury black wristwatch placed on polished marble surface, soft studio lighting with controlled reflections, dramatic shadows, premium product photography setup, macro lens capturing extremely fine metal texture, dark background with subtle gradient lighting, high-end commercial advertisement style, shot on Canon EOS R5, 100mm macro lens, ultra sharp focus, 8K studio photography.'
+      }
+    ]
+  },
+  audio: {
+    icon: '🎵',
+    breadcrumb: 'Module 2 → Creative Content → Audio',
+    title: 'Audio Generation',
+    mainTitle: 'AI Audio Generation',
+    toolName: 'Audio Generator',
+    use: '"Give your ideas a voice that sounds truly human."',
+    free: ['Suno.ai (50 credits per day free)'],
+    paid: ['ElevenLabs Starter (~$5/month)', 'ElevenLabs Creator (~$22/month)', 'ElevenLabs Pro (~$99/month)'],
+    whatWeCan: 'Turn written ideas into immersive audio experiences with the power of AI. Generate human-sounding voices, full songs with lyrics, and professional-quality soundscapes from simple text prompts.',
+    formula: 'Voice type + Emotion + Speaking style + Purpose + Audio quality',
+    prompts: [
+      {
+        title: 'Motivational Song',
+        text: 'Create an energetic motivational pop song about achieving dreams and overcoming struggles. Powerful male vocals with cinematic background music. The lyrics must include the phrases: "Rise again", "Dream beyond limits", "The fire inside", "Unbreakable spirit", "Chasing the impossible", "The road to greatness", "Never look back", and "The future is calling".'
+      },
+      {
+        title: 'Gujarati Romantic Song',
+        text: 'Create a beautiful Gujarati romantic song with soft piano and acoustic guitar music, emotional male or female vocals, and a dreamy atmosphere. The song should feel warm, heartfelt, and cinematic like a modern Gujarati love song. Include the phrases "તારી સ્મિત", "મારું દિલ તારા માટે", "ચાંદની રાત", "તારા આંખોમાં દુનિયા", "હંમેશા તારો સાથ", "પ્રેમની વાતો", "તારી યાદોમાં", and "સપનાઓમાં તું". The song should have emotional verses, a catchy chorus, and professional studio-quality music production.'
+      },
+      {
+        title: 'YouTube Channel Intro',
+        text: 'Generate an energetic and engaging YouTube channel intro voiceover with a friendly and welcoming tone. The voice should sound modern, confident, and enthusiastic, like a professional content creator introducing a new video. Maintain fast but clear pacing, expressive delivery, and crisp studio-quality sound that immediately captures the listener\'s attention. Example intro line: "Welcome to the channel where we explore powerful ideas, innovative technology, and creative tools that can transform the way you create."'
+      }
+    ]
+  },
+  video: {
+    icon: '🎬',
+    breadcrumb: 'Module 2 → Creative Content → Video',
+    title: 'Video Generation',
+    mainTitle: 'AI Video Generation',
+    toolName: 'Video Generator',
+    use: '"Transform your vision into cinematic videos effortlessly."',
+    free: ['Grok (free tier)'],
+    paid: ['Runway (~$12–$15/month)', 'InVideo AI (~$25–$60/month)'],
+    whatWeCan: 'Transform your ideas into engaging videos as AI brings your concepts to life with visuals, motion, and storytelling. Create cinematic content, product videos, and educational pieces without any filming equipment.',
+    formula: 'Subject + Environment + Action + Camera Shot + Camera Movement + Lighting + Mood + Quality',
+    prompts: [
+      {
+        title: 'Luxury Product Advertisement',
+        text: 'A cinematic commercial video of a luxury smartwatch placed on a glossy black reflective surface. Soft studio lighting highlights the metal texture and glass reflections. The watch slowly rotates while the camera performs a smooth macro close-up movement capturing fine details of the dial and craftsmanship. Dramatic shadows, premium advertisement style, ultra-sharp focus, cinematic color grading, 4K commercial video.'
+      },
+      {
+        title: 'Mountain Explorer',
+        text: 'Create a cinematic video of a young explorer standing on a mountain peak during sunrise. The subject is looking at the horizon while wind gently moves his jacket. The camera captures the scene with a wide cinematic drone shot and slowly circles around the subject. The scene is illuminated with warm golden hour lighting creating an inspirational atmosphere. The environment includes moving clouds below the mountains and glowing sunlight across the landscape. The video should look ultra-realistic with cinematic color grading, volumetric lighting, depth of field, and 4K cinematic quality.'
+      },
+      {
+        title: 'Educational Apple Video',
+        text: 'Create an educational cinematic video explaining the health benefits of an apple. Start with a close-up shot of a fresh red apple on a wooden table with soft natural morning light. The camera slowly zooms in while the apple rotates slightly. Transition to scenes showing apple trees in an orchard with sunlight passing through the leaves. Add visual text or narration explaining the benefits: apples are rich in fiber, support heart health, improve digestion, boost immunity, and provide essential vitamins. Use smooth transitions between scenes, bright natural colors, and a clean educational style. The video should feel informative and engaging, with cinematic lighting, high-detail textures, and 4K quality.'
+      }
+    ]
+  }
+};
+
+function openSubpage(type) {
+  const data = subpageData[type];
+  document.getElementById('subpage-breadcrumb').textContent = data.breadcrumb;
+  document.getElementById('subpage-icon').textContent = data.icon;
+  document.getElementById('subpage-title').textContent = data.title;
+
+  const freeItems = data.free.map(f => `<div class="pricing-item free-item">✓ ${f}</div>`).join('');
+  const paidItems = data.paid.map(p => `<div class="pricing-item paid-item">★ ${p}</div>`).join('');
+  const promptCards = data.prompts.map((p, i) => `
+    <div class="prompt-card">
+      <div class="prompt-header">
+        <div class="prompt-num">Prompt ${i+1} — ${p.title}</div>
+        <button class="copy-btn" onclick="copyPrompt(this, \`${p.text.replace(/`/g, '\\`')}\`)">⎘ Copy</button>
+      </div>
+      <div class="prompt-text">${p.text}</div>
+    </div>`).join('');
+
+  document.getElementById('subpage-content').innerHTML = `
+    <!-- 1. Main Title -->
+    <div class="content-section">
+      <div class="main-title-section">
+        <h1 class="main-title-text">${data.mainTitle}</h1>
+      </div>
+    </div>
+
+    <!-- 2. Tool Name -->
+    <div class="content-section">
+      <div class="section-header">
+        <span class="section-icon-sm">🛠️</span>
+        <span class="section-label-sm">Tool Name</span>
+      </div>
+      <div class="tool-name-display">
+        <span class="tool-badge">${data.toolName}</span>
+      </div>
+    </div>
+
+    <!-- 3. Use -->
+    <div class="content-section">
+      <div class="section-header">
+        <span class="section-icon-sm">💡</span>
+        <span class="section-label-sm">Use / Tagline</span>
+      </div>
+      <div class="use-display">${data.use}</div>
+    </div>
+
+    <!-- 4 & 5. Free & Paid -->
+    <div class="content-section">
+      <div class="section-header">
+        <span class="section-icon-sm">💰</span>
+        <span class="section-label-sm">Pricing Options</span>
+      </div>
+      <div class="pricing-grid">
+        <div class="pricing-box">
+          <div class="pricing-label free"><div class="pricing-dot free"></div>Free Tools</div>
+          <div class="pricing-items">${freeItems}</div>
+        </div>
+        <div class="pricing-box">
+          <div class="pricing-label paid"><div class="pricing-dot paid"></div>Paid Tools</div>
+          <div class="pricing-items">${paidItems}</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 6. What We Can Do -->
+    <div class="content-section">
+      <div class="section-header">
+        <span class="section-icon-sm">🎯</span>
+        <span class="section-label-sm">What We Can Do</span>
+      </div>
+      <div class="what-we-can">${data.whatWeCan}</div>
+    </div>
+
+    <!-- 7. Formula -->
+    <div class="content-section">
+      <div class="section-header">
+        <span class="section-icon-sm">📐</span>
+        <span class="section-label-sm">Formula</span>
+      </div>
+      <div class="formula-box">
+        <div class="formula-label">The Perfect Prompt Structure</div>
+        <div class="formula-text">${data.formula}</div>
+      </div>
+    </div>
+
+    <!-- 8. Prompts -->
+    <div class="content-section">
+      <div class="section-header">
+        <span class="section-icon-sm">✍️</span>
+        <span class="section-label-sm">Ready-to-Use Prompts</span>
+      </div>
+      <div class="prompts-section">
+        <div class="prompts-title">Copy and use these professionally crafted prompts</div>
+        ${promptCards}
+      </div>
+    </div>`;
+
+  document.getElementById('main-site').style.display = 'none';
+  document.getElementById('subpage').classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function goHome() {
+  document.getElementById('subpage').classList.remove('active');
+  document.getElementById('main-site').style.display = 'block';
+  closeModal();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// Keyboard ESC
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+// Intersection Observer for module cards
+const observer = new IntersectionObserver(entries => {
+  entries.forEach((entry, i) => {
+    if (entry.isIntersecting) {
+      entry.target.style.animationDelay = `${i * 0.1}s`;
+      entry.target.classList.add('visible');
+    }
+  });
+}, { threshold: 0.1 });
+document.querySelectorAll('.module-card').forEach(card => {
+  card.style.opacity = '0';
+  card.style.transform = 'translateY(30px)';
+  card.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+  observer.observe(card);
+});
+document.querySelectorAll('.module-card').forEach((card, i) => {
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        setTimeout(() => {
+          card.style.opacity = '1';
+          card.style.transform = 'translateY(0)';
+        }, i * 100);
+      }
+    });
+  }, { threshold: 0.1 });
+  io.observe(card);
+});
+</script>
+</body>
+</html>
